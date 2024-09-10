@@ -1,0 +1,21 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "askForPassword": true,
+            "driver": "PostgreSQL",
+            "name": "postgres",
+            "database": "fr_mkpf",
+            "username": "postgres"
+        },
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:alert_new}/alert.db",
+            "name": "sqlite"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

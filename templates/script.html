@@ -1,0 +1,335 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alert</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col w-screen h-screen">
+    <div class="flex flex-col min-w-2xl p-2 gap-2">
+        <div class="flex flex-row items-center">
+            <p class="flex-1 text-xl font-medium">{% if is_create %}New{% else %}Script{% endif %}</p>
+            <a href="/" class="p-2 bg-green-500 rounded-lg">
+                <p class="text-base font-medium text-center">Scripts</p>
+            </a>
+        </div>
+        <div class="flex flex-col gap-1">
+            <p class="text-lg font-medium">Requirements</p>
+            <div class="flex flex-row">
+                <label class="w-32 shrink-0">Name</label>
+                <input id="name-input" class="flex-1 bg-blue-200 p-2 rounded-lg" type="text" value="{{ script.name }}" />
+            </div>
+            <div class="flex flex-row">
+                <label class="w-32 shrink-0">Begin</label>
+                <input id="begin-input" class="flex-1 bg-blue-200 p-2 rounded-lg" type="datetime-local" value="{{ script.begin }}" />
+            </div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <p class="text-lg font-medium">Configs</p>
+            <div class="flex flex-row">
+                <label class="w-32 shrink-0">Custom 1</label>
+                <select id="custom_1_config_select" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                    {% for i in range(16) %}
+                        <option value="{{ i }}" {% if i == script.config.custom_1 %}selected{% endif %}>{{ (i + 1) * 100 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex flex-row">
+                <label class="w-32 shrink-0">Custom 2</label>
+                <select id="custom_2_config_select" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                    {% for i in range(16) %}
+                        <option value="{{ i }}" {% if i == script.config.custom_2 %}selected{% endif %}>{{ (i + 1) * 200 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex flex-row">
+                <label class="w-32 shrink-0">Noise</label>
+                <select id="noise_config_select" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                    {% for i in range(16) %}
+                        <option value="{{ i }}" {% if i == script.config.noise %}selected{% endif %}>{{ (i + 1) * 100 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <p class="text-lg font-medium">Scripts</p>
+            <div id="scripts-container" class="flex flex-col gap-2">
+                <template id="item-template">
+                    <div class="phrase-item flex flex-col bg-blue-400 p-2 rounded-lg">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Tone</label>
+                                <select name="tone" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in tone_options %}
+                                        <option value="{{ i }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Tone noise</label>
+                                <select name="tone_noise" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in yes_no_options %}
+                                        <option value="{{ i }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Echo</label>
+                                <select name="echo" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in tone_options %}
+                                        <option value="{{ i }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Echo noise</label>
+                                <select name="echo_noise" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in yes_no_options %}
+                                        <option value="{{ i }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Delay</label>
+                                <select name="delay" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in delay_options %}
+                                        <option value="{{ i }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Loop</label>
+                                <select name="loop" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in loop_options %}
+                                        <option value="{{ i }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <button class="delete-phrase-button flex-1 bg-red-500 p-2 rounded-lg">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                {% for phrase in script.phrases %}
+                    <div class="phrase-item flex flex-col bg-blue-400 p-2 rounded-lg">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Tone</label>
+                                <select name="tone" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in tone_options %}
+                                        <option value="{{ i }}" {% if i == phrase.tone %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Tone noise</label>
+                                <select name="tone_noise" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in yes_no_options %}
+                                        <option value="{{ i }}" {% if i == phrase.tone_noise %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Echo</label>
+                                <select name="echo" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in tone_options %}
+                                        <option value="{{ i }}" {% if i == phrase.echo %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Echo noise</label>
+                                <select name="echo_noise" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in yes_no_options %}
+                                        <option value="{{ i }}" {% if i == phrase.echo_noise %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Delay</label>
+                                <select name="delay" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in delay_options %}
+                                        <option value="{{ i }}" {% if i == phrase.delay %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <label class="w-32 shrink-0">Loop</label>
+                                <select name="loop" class="flex-1 bg-blue-200 p-2 rounded-lg">
+                                    {% for i, label in loop_options %}
+                                        <option value="{{ i }}" {% if i == phrase.loop %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flex flex-row">
+                                <button class="delete-phrase-button flex-1 bg-red-500 p-2 rounded-lg">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="flex flex-col">
+                <button id="add-item" class="flex-1 bg-blue-500 p-2 rounded-lg">Add</button>
+            </div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <button class="flex-1 bg-yellow-500 p-2 rounded-lg" onclick="{% if is_create %}createScript(){% else %}updateScript(){% endif %}">Save</button>
+            <button class="flex-1 bg-orange-500 p-2 rounded-lg" onclick="deleteScript()" style="{% if is_create %}display: none;{% else %}{% endif %}">Delete</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addButton = document.getElementById('add-item');
+            const container = document.getElementById('scripts-container');
+            const template = document.getElementById('item-template').content;
+
+            addButton.addEventListener('click', function() {
+                // Clone the template and append it to the container
+                const newItem = document.importNode(template, true);
+                container.appendChild(newItem);
+            });
+
+            // Event delegation for dynamically added delete buttons
+            container.addEventListener('click', function(event) {
+                if (event.target && event.target.matches('button.delete-phrase-button')) {
+                    event.target.closest('.phrase-item').remove();
+                }
+            });
+        });
+
+        function createScript() {
+            nameInput = document.getElementById('name-input');
+            beginInput = document.getElementById('begin-input');
+            custom1ConfigSelect = document.getElementById('custom_1_config_select');
+            custom2ConfigSelect = document.getElementById('custom_2_config_select');
+            noiseConfigSelect = document.getElementById('noise_config_select');
+            container = document.getElementById('scripts-container');
+            items = container.querySelectorAll('.phrase-item');
+
+            custom1Config = parseInt(custom1ConfigSelect.options[custom1ConfigSelect.selectedIndex].value);
+            custom2congig = parseInt(custom2ConfigSelect.options[custom2ConfigSelect.selectedIndex].value);
+            noiseconfig = parseInt(noiseConfigSelect.options[noiseConfigSelect.selectedIndex].value);
+
+            phrases = [];
+            items.forEach(item => {
+                selects = item.querySelectorAll('select[name]');
+                values = {};
+                
+                selects.forEach(select => {
+                    values[select.name] = parseInt(select.value);
+                });
+
+                phrases.push(values);
+            });
+
+
+            params = {
+                name: nameInput.value,
+                begin: beginInput.value,
+                config: {
+                    custom_1: custom1Config,
+                    custom_2: custom2congig,
+                    noise: noiseconfig,
+                },
+                phrases: phrases,
+            };
+            console.log(params);
+
+            fetch('http://localhost:8000/new', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                window.location.href = `/`;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function updateScript() {
+            nameInput = document.getElementById('name-input');
+            beginInput = document.getElementById('begin-input');
+            custom1ConfigSelect = document.getElementById('custom_1_config_select');
+            custom2ConfigSelect = document.getElementById('custom_2_config_select');
+            noiseConfigSelect = document.getElementById('noise_config_select');
+            container = document.getElementById('scripts-container');
+            items = container.querySelectorAll('.phrase-item');
+
+            custom1Config = parseInt(custom1ConfigSelect.options[custom1ConfigSelect.selectedIndex].value);
+            custom2congig = parseInt(custom2ConfigSelect.options[custom2ConfigSelect.selectedIndex].value);
+            noiseconfig = parseInt(noiseConfigSelect.options[noiseConfigSelect.selectedIndex].value);
+
+            phrases = [];
+            items.forEach(item => {
+                selects = item.querySelectorAll('select[name]');
+                values = {};
+                
+                selects.forEach(select => {
+                    values[select.name] = parseInt(select.value);
+                });
+
+                phrases.push(values);
+            });
+
+
+            params = {
+                name: nameInput.value,
+                begin: beginInput.value,
+                config: {
+                    custom_1: custom1Config,
+                    custom_2: custom2congig,
+                    noise: noiseconfig,
+                },
+                phrases: phrases,
+            };
+            console.log(params);
+
+            fetch(`http://localhost:8000/update/{{ script.id }}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                window.location.href = `/`;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function deleteScript() {
+            fetch(`http://localhost:8000/delete/{{ script.id }}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                window.location.href = `/`;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
