@@ -151,8 +151,11 @@ async def update_script_submit(setting: Setting):
     return settingRepository.update_script('script', setting.value)
 
 def cal_requirements_of_header_seg(begin, phrases):
-    timediff = int((datetime.now(timezone.utc) - begin).total_seconds() / 60)
-    ph = phrases.dict()
+    if len(phrases) == 0:
+        return (0, 0, 0)
+
+    timediff = int((datetime.now() - begin).total_seconds() / 60)
+    ph = [p.dict() for p in phrases]
     sum_time_of_cycle = 0
 
     for p in ph:
@@ -162,10 +165,17 @@ def cal_requirements_of_header_seg(begin, phrases):
     
     cycle_times = timediff // sum_time_of_cycle
 
+    print(timediff, cycle_times, sum_time_of_cycle, begin, datetime.now())
+    # 23 2 10 2024-09-13 10:02:00 2024-09-13 10:25:07.616816
+    # 23 2 10 2024-09-13 10:02:00 2024-09-13 10:25:07.616816
+
     if cycle_times != 0:
         timediff = timediff - cycle_times * sum_time_of_cycle
+
+    print(timediff, cycle_times, sum_time_of_cycle, begin, datetime.now())
+    # 5 2 10 2024-09-13 10:02:00 2024-09-13 10:27:06.454330
     
-    in_phrase = None
+    in_phrase = ph[0]
     index = 0
     for p in ph:
         if p['sum_time'] >= timediff:
@@ -174,6 +184,9 @@ def cal_requirements_of_header_seg(begin, phrases):
         else:
             index += 1
             in_phrase = p
+    else:
+        in_phrase = ph[0]
+        index = 0
     
     loop = timediff // in_phrase['unit_time']
     if loop != 0:
@@ -194,9 +207,16 @@ async def update_script_submit():
     try:
         script = scriptRepository.get_script(int(sid))
         roh = cal_requirements_of_header_seg(script.begin, script.phrases)
-        config_bytes = bytes([script.config.custom_1 << 4 | script.config.custom_2, script.config.noise << 4 | roh[0], roh[1] << 4 | roh[2], 0])
-        pharses_bytes = bytes([b for b in script.phrases_bytes])
+        config_bytes = bytes([
+            (script.config.custom_1 << 4 | script.config.custom_2) & 0xFF,
+            (script.config.noise << 4 | roh[0]) & 0xFF,
+            (roh[1] << 4 | roh[2]) & 0xFF,
+            0
+        ])
+        pharses_bytes = script.phrases_bytes
     except:
-        pass
+        print("heheheheheeheheheheeheheheeheh")
+        config_bytes = bytes([0, 0, 0, 0])
+        pharses_bytes = bytes([0, 0, 0, 0])
 
     return Response(content=config_bytes + pharses_bytes, media_type="application/octet-stream")
