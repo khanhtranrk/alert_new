@@ -239,7 +239,7 @@
             };
             console.log(params);
 
-            fetch('http://localhost:8000/new', {
+            fetch('/new', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -296,7 +296,7 @@
             };
             console.log(params);
 
-            fetch(`http://localhost:8000/update/{{ script.id }}`, {
+            fetch(`/update/{{ script.id }}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -316,7 +316,7 @@
         }
 
         function deleteScript() {
-            fetch(`http://localhost:8000/delete/{{ script.id }}`, {
+            fetch(`/delete/{{ script.id }}`, {
                 method: 'DELETE',
             })
             .then(response => {
